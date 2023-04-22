@@ -115,3 +115,33 @@
 	});
 
 })(jQuery);
+
+$(document).ready(function() {
+  $('#contact-form').submit(function(event) {
+    event.preventDefault(); // prevent default form submission
+    var formData = $(this).serialize(); // get form data as string
+    $.ajax({
+      type: 'POST',
+      url: '/contact',
+      data: formData,
+	  success: function(response) {
+      if (response.message === "success") {
+		  // show success message
+     	 $("#sendmessage").text(response.success).show();
+	     $('#errormessage').hide();
+
+	  } else {
+		  // show error message
+     	 $("#errormessage").text(response.error).show();
+	     $('#sendmessage').hide();
+
+    }
+  },
+      error: function(response) {
+        $('#errormessage').show();
+        $('#sendmessage').hide();
+      }
+    });
+  });
+});
+

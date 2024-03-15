@@ -1892,3 +1892,20 @@ textarea.form-input::-webkit-resizer { display: none; }
 .error {
     color: red;
 }
+
+.sweet_loader {
+	width: 140px;
+	height: 140px;
+	margin: 0 auto;
+	animation-duration: 0.5s;
+	animation-timing-function: linear;
+	animation-iteration-count: infinite;
+	animation-name: ro;
+	transform-origin: 50% 50%;
+	transform: rotate(0) translate(0,0);
+}
+@keyframes ro {
+	100% {
+		transform: rotate(-360deg) translate(0,0);
+	}
+}

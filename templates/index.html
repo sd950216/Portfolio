@@ -11,6 +11,7 @@
     - favicon
   -->
   <link rel="shortcut icon" href="../static/images/logo.ico" type="image/x-icon">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-dark@5/dark.css" />
 
   <!--
     - custom css link
@@ -964,41 +965,89 @@ Best regards,
 
   <script src="../static/js/script.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+
 <script>
-    $(document).ready(function() {
-        $('#contact-form').submit(function(event) {
-            event.preventDefault(); // Prevent default form submission
+// the loader html
+var sweet_loader = '<div class="sweet_loader"><svg viewBox="0 0 140 140" width="140" height="140"><g class="outline"><path d="m 70 28 a 1 1 0 0 0 0 84 a 1 1 0 0 0 0 -84" stroke="rgba(0,0,0,0.1)" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></g><g class="circle"><path d="m 70 28 a 1 1 0 0 0 0 84 a 1 1 0 0 0 0 -84" stroke="#71BBFF" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-dashoffset="200" stroke-dasharray="300"></path></g></svg></div>';
 
-            const form = $(this);
-            const messageDisplay = $('#message'); // Message display area
+$(document).ready(function() {
+    $('#contact-form').submit(function(event) {
+        event.preventDefault(); // Prevent default form submission
 
-            const formData = form.serialize(); // Serialize form data
-            messageDisplay.hide(); // Hide message
+        const form = $(this);
+        const messageDisplay = $('#message'); // Message display area
 
-            $.ajax({
-                type: "POST",
-                url: "/contact", // Update the URL to match your Flask route
-                data: formData,
-                success: function(data) {
-                    if (data.success) {
-                        // Show success message and possibly reset form
-                        messageDisplay.text('Message sent successfully').removeClass('error').show().css('opacity', '1');
-                        form[0].reset();
-                    } else {
-                        // Show error message
-                        messageDisplay.text('Failed to send message. Please try again.').addClass('error').show().css('opacity', '1');
-                    }
-                },
-                error: function() {
-                    messageDisplay.text('Sorry, you can only send one message per 5 minutes.').addClass('error').show().css('opacity', '1');
-                },
-                complete: function() {
-                    // Re-enable the submit button
-                    form.find('[data-form-btn]').prop('disabled', false);
+        const formData = form.serialize(); // Serialize form data
+        messageDisplay.hide(); // Hide message
+
+        // Show loading spinner
+        const loading = Swal.fire({
+            html: '<h5>sending...</h5>',
+            showConfirmButton: false,
+            onRender: function() {
+                 // there will only ever be one sweet alert open.
+                 $('.swal2-content').prepend(sweet_loader);
+            },
+            allowOutsideClick: false,
+            allowEscapeKey: false
+        });
+
+        $.ajax({
+            type: "POST",
+            url: "/contact", // Update the URL to match your Flask route
+            data: formData,
+            success: function(data) {
+                loading.close(); // Close loading spinner
+                if (data.success) {
+                    // Show success message and possibly reset form
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success',
+                        text: 'Message sent successfully',
+                                            allowEscapeKey: false,
+                    allowOutsideClick: false,
+                    timer: 2000,
+                    timerProgressBar:true,
+                    showConfirmButton: false
+                    });
+                    form[0].reset();
+                } else {
+                    // Show error message
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Failed to send message. Please try again.',
+                                            allowEscapeKey: false,
+                    allowOutsideClick: false,
+                    timer: 2000,
+                    timerProgressBar:true,
+                    showConfirmButton: false
+                    });
                 }
-            });
+            },
+            error: function() {
+                loading.close(); // Close loading spinner
+                // Show error message
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Sorry, you can only send one message per 5 minutes.',
+                    allowEscapeKey: false,
+                    allowOutsideClick: false,
+                    timer: 2000,
+                    timerProgressBar:true,
+                    showConfirmButton: false
+                });
+            },
+            complete: function() {
+                // Re-enable the submit button
+                form.find('[data-form-btn]').prop('disabled', false);
+            }
         });
     });
+});
+
 </script>
 
   <!--

@@ -1,10 +1,7 @@
-import re
-
-from flask import Flask, render_template, request, redirect, jsonify, abort
+from flask import Flask, render_template, request, jsonify
 import os
 from flask_mail import Mail, Message
 from flask_caching import Cache
-import time
 
 app = Flask(__name__)
 app.config.update(
@@ -12,14 +9,14 @@ app.config.update(
     MAIL_SERVER='smtp.gmail.com',
     MAIL_PORT=465,
     MAIL_USE_SSL=True,
-    MAIL_USERNAME='example@example.com',
-    MAIL_DEFAULT_SENDER='example@example.com',
-    MAIL_PASSWORD='your_password',
+    MAIL_USERNAME='motrappentesting@gmail.com',
+    MAIL_DEFAULT_SENDER='motrappentesting@gmail.com',
+    MAIL_PASSWORD=f'{os.getenv("MAIL_PASSWORD")}',
 )
 # Configure Flask-Caching
 cache = Cache(app, config={'CACHE_TYPE': 'simple'})
 
-
+print(f'{os.getenv("MAIL_PASSWORD")}')
 # Custom decorator to implement rate limiting
 def rate_limit(limit_per, key_func):
     def decorator(func):
@@ -44,16 +41,6 @@ def home():
     return render_template('index.html')
 
 
-@app.route('/portfolio')
-def portfolio():
-    return render_template('portfolio.html')
-
-
-@app.route('/projects')
-def projects():
-    return render_template('projects.html')
-
-
 @app.route('/contact', methods=['POST'])
 @rate_limit(limit_per=300, key_func=lambda: request.remote_addr)
 def contact():
@@ -76,7 +63,7 @@ def contact():
     """
 
     # Send email using Flask-Mail with HTML content
-    msg = Message('New Contact Form Submission', recipients=['recipient@example.com'])
+    msg = Message('New Contact Form Submission', recipients=['meen79508@gmail.com'])
     msg.body = 'This is a plain text version of the email. Please use an email client that supports HTML to view the content.'
     msg.html = email_content  # Set the HTML content
     try:
@@ -87,11 +74,6 @@ def contact():
         success = False
 
     return jsonify({'success': success})
-
-
-@app.route('/thank-you')
-def thank_you():
-    return render_template('thank-you.html')
 
 
 if __name__ == '__main__':
